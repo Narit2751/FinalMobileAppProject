@@ -106,6 +106,8 @@ class GeminiMusicAssistantService(
             val prompt = """
                 You rank only the supplied verified candidates. Return only candidate IDs from the supplied list.
                 Never create another artist, member, album, song, or ID. Reasons must use supplied metadata only.
+                Give each recommendation a useful two-sentence reason: first state the strongest metadata-based match,
+                then mention a relevant limitation or secondary match. Do not repeat the candidate name as filler.
                 Treat energetic, relaxing, emotional, dark, happy, and focused as subjective vibe preferences.
                 Judge vibe fit only from each candidate's supplied genres and tags. Do not state that a vibe is an
                 objective fact about a band, and do not invent style details that are absent from the metadata.
@@ -122,7 +124,7 @@ class GeminiMusicAssistantService(
                     entityId = it.entityId,
                     entityType = MusicEntityType.entries.firstOrNull { type -> type.name == it.entityType }
                         ?: throw InvalidAiResponseException(),
-                    reason = it.reason.trim().take(280),
+                    reason = it.reason.trim().take(MAX_REASON_CHARS),
                 )
             }
         }
@@ -140,19 +142,24 @@ class GeminiMusicAssistantService(
         ensureConfigured()
         if (proxyApi != null) {
             return call { proxyApi.explain(ProxyExplainRequest(candidateDto(entity), question.take(300))).explanation }
-                .trim().takeIf(String::isNotEmpty) ?: throw InvalidAiResponseException()
+                .trim().take(MAX_EXPLANATION_CHARS).takeIf(String::isNotEmpty) ?: throw InvalidAiResponseException()
         }
         val prompt = """
             Answer only from the supplied verified metadata. If the metadata does not contain the requested fact,
             state that the information is unavailable. Do not add names, roles, dates, releases, or biography facts.
+            Start with a direct answer to the question. Then give the most useful supporting details in two to four
+            short paragraphs (roughly 90 to 180 words when enough metadata exists). Clearly separate verified facts
+            from subjective interpretation. Avoid filler, repeated sentences, Markdown headings, and unsupported
+            claims. For sparse metadata, be concise and say exactly which requested information is unavailable.
             Entity: ${moshi.adapter(ProxyCandidateDto::class.java).toJson(candidateDto(entity))}
             Question: ${question.take(300)}
         """.trimIndent()
         return parseJson(
             moshi.adapter(ExplanationWire::class.java),
-            generate(prompt, explanationSchema, maxOutputTokens = 768),
+            generate(prompt, explanationSchema, maxOutputTokens = 1024),
         )
-            .explanation.trim().takeIf(String::isNotEmpty) ?: throw InvalidAiResponseException()
+            .explanation.trim().take(MAX_EXPLANATION_CHARS).takeIf(String::isNotEmpty)
+            ?: throw InvalidAiResponseException()
     }
 
     private suspend fun generate(
@@ -263,6 +270,8 @@ class GeminiMusicAssistantService(
 
     private companion object {
         const val MAX_RESPONSE_CHARS = 20_000
+        const val MAX_REASON_CHARS = 420
+        const val MAX_EXPLANATION_CHARS = 2_000
         val string = GeminiJsonSchema("string")
         val parseSchema = GeminiJsonSchema(
             "object",

@@ -155,8 +155,8 @@ class AiFinderViewModel(
                 when {
                     parsed.intent in RECOMMENDATION_INTENTS && parsed.entities.isEmpty() && referenced == null -> recommend(parsed, loadingId)
                     referenced != null && parsed.entities.isEmpty() && parsed.intent in RELATED_INTENTS -> showRelated(referenced, parsed.intent, loadingId)
-                    referenced != null && parsed.entities.isEmpty() -> showEntities(listOf(referenced), parsed.intent, loadingId)
-                    parsed.entities.isNotEmpty() -> resolveMention(parsed, loadingId)
+                    referenced != null && parsed.entities.isEmpty() -> showEntityAnswer(referenced, parsed.intent, chatRequest.message, loadingId)
+                    parsed.entities.isNotEmpty() -> resolveMention(parsed, chatRequest.message, loadingId)
                     else -> replaceLoading(loadingId, ChatMessage.AssistantText(id(), OUT_OF_SCOPE))
                 }
             } catch (error: Exception) {
@@ -179,7 +179,7 @@ class AiFinderViewModel(
             ?: aiService.parseRequest(request.message, context)
     }
 
-    private suspend fun resolveMention(parsed: ParsedMusicRequest, loadingId: String) {
+    private suspend fun resolveMention(parsed: ParsedMusicRequest, question: String, loadingId: String) {
         val mention = parsed.entities.first()
         val artistHint = parsed.entities.firstOrNull { it.type == MusicEntityType.BAND }?.name
             ?: _state.value.conversationContext.currentBand?.name
@@ -203,7 +203,7 @@ class AiFinderViewModel(
                     else "I found the artist, but no verified ${parsed.intent.name.substringAfter("LIST_").lowercase()} were returned."
                     replaceLoading(loadingId, ChatMessage.AssistantText(id(), unavailable))
                 } else showEntities(related, parsed.intent, loadingId)
-            } else showEntities(choices, parsed.intent, loadingId)
+            } else showEntityAnswer(base, parsed.intent, question, loadingId)
         }
     }
 
@@ -225,10 +225,26 @@ class AiFinderViewModel(
     private suspend fun showRelated(entity: ResolvedMusicEntity, intent: MusicIntent, loadingId: String) {
         val related = resolver.related(entity, intent)
         if (related.isEmpty()) {
-            val message = if (intent == MusicIntent.LIST_MEMBERS) "I found the artist, but verified band-membership information is unavailable."
-            else "No verified results were returned for that follow-up."
-            replaceLoading(loadingId, ChatMessage.AssistantText(id(), message))
+            replaceLoading(loadingId, ChatMessage.AssistantText(id(), unavailableRelatedMessage(intent)))
         } else showEntities(related, intent, loadingId)
+    }
+
+    private suspend fun showEntityAnswer(
+        entity: ResolvedMusicEntity,
+        intent: MusicIntent,
+        question: String,
+        loadingId: String,
+    ) {
+        val answer = if (shouldUseAiExplanation(intent, question) && aiService.isConfigured) {
+            try {
+                aiService.explainEntity(entity, question)
+            } catch (_: Exception) {
+                verifiedOverview(entity)
+            }
+        } else verifiedOverview(entity)
+        val card = ChatMessage.EntityResults(id(), entityIntroduction(entity), listOf(entity), actionsFor(listOf(entity)))
+        replaceLoading(loadingId, listOf(ChatMessage.AssistantText(id(), answer), card))
+        updateContext(listOf(entity), intent, emptyList())
     }
 
     private fun relatedBand(entity: ResolvedMusicEntity): ResolvedMusicEntity.ResolvedBand? = when (entity) {
@@ -239,7 +255,7 @@ class AiFinderViewModel(
     }
 
     private fun showEntities(entities: List<ResolvedMusicEntity>, intent: MusicIntent, loadingId: String? = null) {
-        val message = ChatMessage.EntityResults(id(), "Verified music data", entities, actionsFor(entities))
+        val message = ChatMessage.EntityResults(id(), resultIntroduction(intent, entities.size), entities, actionsFor(entities))
         if (loadingId == null) update { it.copy(messages = it.messages + message) } else replaceLoading(loadingId, message)
         updateContext(entities, intent, emptyList())
     }
@@ -300,6 +316,68 @@ class AiFinderViewModel(
         state.copy(messages = state.messages.map { if (it.id == loadingId) message else it })
     }
 
+    private fun replaceLoading(loadingId: String, messages: List<ChatMessage>) = update { state ->
+        state.copy(messages = state.messages.flatMap { if (it.id == loadingId) messages else listOf(it) })
+    }
+
+    private fun shouldUseAiExplanation(intent: MusicIntent, question: String): Boolean {
+        if (intent == MusicIntent.EXPLAIN_ENTITY) return true
+        val lower = question.lowercase()
+        return listOf("tell me", "explain", "about", "what is", "who is", "style", "origin", "why", "how")
+            .any(lower::contains)
+    }
+
+    private fun verifiedOverview(entity: ResolvedMusicEntity): String = when (entity) {
+        is ResolvedMusicEntity.ResolvedBand -> buildList {
+            add("${entity.name} is a verified music group${entity.countryOrArea?.let { " associated with $it" }.orEmpty()}.")
+            if (entity.genres.isNotEmpty()) add("MusicBrainz lists these genres or tags: ${entity.genres.take(5).joinToString()}.")
+            entity.beginDate?.let { add("Its recorded begin date is $it.") }
+            entity.ended?.let { add(if (it) "MusicBrainz marks the group as ended." else "MusicBrainz does not mark the group as ended.") }
+            if (size == 1) add("More verified background information is unavailable in the current metadata.")
+        }.joinToString(" ")
+        is ResolvedMusicEntity.ResolvedMember -> buildList {
+            add("${entity.name} is a verified person entry in MusicBrainz.")
+            if (entity.bands.isEmpty()) add("Verified band-membership details are unavailable.")
+            else add(entity.bands.joinToString(prefix = "Verified band connections: ", postfix = ".") { link ->
+                val role = link.roles.takeIf(List<String>::isNotEmpty)?.joinToString()?.let { ", role: $it" }.orEmpty()
+                "${link.bandName}$role (${if (link.isCurrent) "current" else "former"})"
+            })
+        }.joinToString(" ")
+        is ResolvedMusicEntity.ResolvedAlbum -> buildList {
+            add("${entity.name} is a verified ${entity.primaryType?.lowercase() ?: "release group"}${entity.artistName?.let { " by $it" }.orEmpty()}.")
+            entity.firstReleaseDate?.let { add("Its first-release date is $it.") }
+            if (size == 1) add("Additional verified release details are unavailable in the current metadata.")
+        }.joinToString(" ")
+        is ResolvedMusicEntity.ResolvedSong -> buildList {
+            add("${entity.name} is a verified recording${entity.artistName?.let { " credited to $it" }.orEmpty()}.")
+            entity.albumName?.let { add("The available release data connects it to $it.") }
+            entity.durationMillis?.let { duration -> add("The recorded duration is ${duration / 60_000}:${((duration / 1_000) % 60).toString().padStart(2, '0')}.") }
+            if (size == 1) add("Additional verified recording details are unavailable.")
+        }.joinToString(" ")
+    }
+
+    private fun entityIntroduction(entity: ResolvedMusicEntity) = "Verified ${entity.type.name.lowercase()} record"
+
+    private fun resultIntroduction(intent: MusicIntent, count: Int): String = when (intent) {
+        MusicIntent.LIST_MEMBERS -> "$count verified band member${if (count == 1) "" else "s"}"
+        MusicIntent.LIST_ALBUMS -> "$count verified album${if (count == 1) "" else "s"}"
+        MusicIntent.LIST_SONGS, MusicIntent.RECOMMEND_SONGS -> "$count verified song${if (count == 1) "" else "s"}"
+        MusicIntent.FIND_ALBUM_FOR_SONG -> "Verified album connected to this recording"
+        MusicIntent.FIND_ARTIST_FOR_SONG -> "Verified artist credited for this recording"
+        MusicIntent.FIND_BAND_FOR_MEMBER -> "Verified band connection"
+        else -> "Verified music data"
+    }
+
+    private fun unavailableRelatedMessage(intent: MusicIntent): String = when (intent) {
+        MusicIntent.LIST_MEMBERS -> "I found the artist, but verified band-membership information is unavailable."
+        MusicIntent.FIND_ALBUM_FOR_SONG -> "I found the song, but its verified album information is unavailable."
+        MusicIntent.FIND_ARTIST_FOR_SONG -> "I found the song, but its verified artist credit is unavailable."
+        MusicIntent.FIND_BAND_FOR_MEMBER -> "I found the member, but no verified band relationship is available."
+        MusicIntent.LIST_ALBUMS -> "I found the artist, but no verified albums were returned."
+        MusicIntent.LIST_SONGS, MusicIntent.RECOMMEND_SONGS -> "I found the artist, but no verified songs were returned."
+        else -> "No verified results were returned for that follow-up."
+    }
+
     private fun recommendationPrompt(type: MusicEntityType?, vibes: Set<String>): String {
         if (type == null && vibes.isEmpty()) return ""
         val target = when (type) {
@@ -332,7 +410,15 @@ class AiFinderViewModel(
         const val MISSING_CONFIGURATION = "Gemini is not configured. Add the local debug configuration or configure the AI proxy to enable chat recommendations."
         const val OUT_OF_SCOPE = "I can help you discover Japanese bands, members, albums, and songs. Try entering a name, genre, mood, or listening activity."
         val RECOMMENDATION_INTENTS = setOf(MusicIntent.RECOMMEND_BANDS, MusicIntent.RECOMMEND_SONGS, MusicIntent.RECOMMEND_ALBUMS, MusicIntent.RECOMMEND_SIMILAR, MusicIntent.REFINE_PREVIOUS)
-        val RELATED_INTENTS = setOf(MusicIntent.LIST_MEMBERS, MusicIntent.LIST_ALBUMS, MusicIntent.LIST_SONGS, MusicIntent.RECOMMEND_SONGS)
+        val RELATED_INTENTS = setOf(
+            MusicIntent.LIST_MEMBERS,
+            MusicIntent.LIST_ALBUMS,
+            MusicIntent.LIST_SONGS,
+            MusicIntent.RECOMMEND_SONGS,
+            MusicIntent.FIND_BAND_FOR_MEMBER,
+            MusicIntent.FIND_ALBUM_FOR_SONG,
+            MusicIntent.FIND_ARTIST_FOR_SONG,
+        )
         val ENTITY_PREFIXES = mapOf(MusicEntityType.BAND to "Tell me about the band ", MusicEntityType.MEMBER to "Which band is this member from? ", MusicEntityType.ALBUM to "Tell me about the album ", MusicEntityType.SONG to "Recommend music like the song ")
         val SUGGESTION_PAGES = listOf(
             listOf("Energetic", "J-Rock", "Metal", "Female vocals", "Relaxing", "Workout"),

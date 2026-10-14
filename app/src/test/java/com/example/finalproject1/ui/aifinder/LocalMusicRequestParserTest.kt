@@ -4,6 +4,7 @@ import com.example.finalproject1.data.model.ConversationContext
 import com.example.finalproject1.data.model.MusicEntityType
 import com.example.finalproject1.data.model.MusicIntent
 import com.example.finalproject1.data.model.ReferenceType
+import com.example.finalproject1.data.model.ResolvedMusicEntity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -63,6 +64,29 @@ class LocalMusicRequestParserTest {
 
         assertEquals(MusicEntityType.ALBUM, result?.entities?.single()?.type)
         assertEquals("Conqueror", result?.entities?.single()?.name)
+        assertEquals(MusicIntent.EXPLAIN_ENTITY, result?.intent)
+    }
+
+    @Test fun `album and artist questions about current song use verified relationships`() {
+        val songContext = ConversationContext(
+            currentSong = ResolvedMusicEntity.ResolvedSong(
+                id = "song-id",
+                name = "Choose Me",
+                artistName = "BAND-MAID",
+                artistId = "band-id",
+                albumName = "Just Bring It",
+                albumId = "album-id",
+            )
+        )
+
+        assertEquals(
+            MusicIntent.FIND_ALBUM_FOR_SONG,
+            LocalMusicRequestParser.parse("Which album is this song from?", songContext)?.intent,
+        )
+        assertEquals(
+            MusicIntent.FIND_ARTIST_FOR_SONG,
+            LocalMusicRequestParser.parse("Which band performs this song?", songContext)?.intent,
+        )
     }
 
     @Test fun `numbered result is resolved without Gemini`() {

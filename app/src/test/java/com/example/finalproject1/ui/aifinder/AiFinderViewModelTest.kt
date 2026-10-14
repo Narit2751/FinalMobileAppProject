@@ -61,6 +61,19 @@ class AiFinderViewModelTest {
         assertEquals("verified-id", vm.state.value.conversationContext.currentBand?.id)
     }
 
+    @Test fun `tell me about request includes grounded explanation and verified card`() = runTest(dispatcher) {
+        val ai = FakeAiMusicAssistantService(explanation = "Grounded answer using verified metadata.")
+        val vm = createVm(ai)
+        vm.updateInput("Tell me about the band BAND-MAID")
+        vm.submit(); advanceUntilIdle()
+
+        assertTrue(vm.state.value.messages.any {
+            it is ChatMessage.AssistantText && it.text == "Grounded answer using verified metadata."
+        })
+        assertTrue(vm.state.value.messages.last() is ChatMessage.EntityResults)
+        assertFalse(vm.state.value.messages.any { it is ChatMessage.Loading })
+    }
+
     @Test fun `recommendation displays only fake ranked verified candidate`() = runTest(dispatcher) {
         val ai = FakeAiMusicAssistantService(
             parsed = ParsedMusicRequest(MusicIntent.RECOMMEND_BANDS, preferences = listOf("rock")),

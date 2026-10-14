@@ -73,6 +73,18 @@ class GeminiMusicAssistantServiceTest {
         assertEquals(false, prompt.contains("PRIVATE_UNNEEDED_TEXT"))
     }
 
+    @Test fun `entity explanation requests a direct detailed grounded answer`() = runTest {
+        val api = RecordingGeminiApi("""{"explanation":"A grounded explanation."}""")
+        val service = GeminiMusicAssistantService("model", moshi, api, "key")
+
+        assertEquals("A grounded explanation.", service.explainEntity(band, "Explain this band's style"))
+        val prompt = api.request!!.contents.single().parts.single().text
+        assertEquals(true, prompt.contains("Start with a direct answer"))
+        assertEquals(true, prompt.contains("two to four"))
+        assertEquals(true, prompt.contains("rock"))
+        assertEquals(1024, api.request?.generationConfig?.maxOutputTokens)
+    }
+
     @Test fun `authentication quota timeout and service failures are classified`() = runTest {
         suspend fun failureFor(error: Exception): Exception? {
             val service = GeminiMusicAssistantService("model", moshi, FailingGeminiApi(error), "key")

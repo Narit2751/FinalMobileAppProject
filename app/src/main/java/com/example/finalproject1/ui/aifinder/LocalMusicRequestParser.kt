@@ -45,6 +45,15 @@ object LocalMusicRequestParser {
             }
         }.filterNot { it == "rock" && "j-rock" in lower }.distinct()
 
+        if (reference.type == ReferenceType.CURRENT_SONG && lower.contains("album")) {
+            return ParsedMusicRequest(MusicIntent.FIND_ALBUM_FOR_SONG, preferences = foundPreferences, reference = reference)
+        }
+        if (reference.type == ReferenceType.CURRENT_SONG && (lower.contains("band") || lower.contains("artist") || lower.contains("perform"))) {
+            return ParsedMusicRequest(MusicIntent.FIND_ARTIST_FOR_SONG, preferences = foundPreferences, reference = reference)
+        }
+        if (reference.type == ReferenceType.CURRENT_MEMBER && lower.contains("band")) {
+            return ParsedMusicRequest(MusicIntent.FIND_BAND_FOR_MEMBER, preferences = foundPreferences, reference = reference)
+        }
         if (lower.contains("member") && (lower.contains("who") || lower.contains("show") || lower.contains("list"))) {
             return ParsedMusicRequest(MusicIntent.LIST_MEMBERS, explicitBand(clean), foundPreferences, reference)
         }
@@ -100,7 +109,12 @@ object LocalMusicRequestParser {
         ).matchEntire(original.trim()) ?: return null
         val name = match.groupValues[1].trim().trim('"', '\'')
         if (name.isBlank() || name.equals("is this", true)) return null
-        return ParsedMusicRequest(MusicIntent.LOOKUP_ENTITY, listOf(EntityMention(type, name)))
+        val intent = if (original.trim().startsWith("tell me about", ignoreCase = true) ||
+            original.trim().startsWith("what is", ignoreCase = true) ||
+            original.trim().startsWith("who is", ignoreCase = true)) {
+            MusicIntent.EXPLAIN_ENTITY
+        } else MusicIntent.LOOKUP_ENTITY
+        return ParsedMusicRequest(intent, listOf(EntityMention(type, name)))
     }
 
     private fun explicitBand(message: String): List<EntityMention> {

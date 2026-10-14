@@ -125,6 +125,25 @@ class MusicBrainzEntityResolver(
         entity: ResolvedMusicEntity,
         intent: com.example.finalproject1.data.model.MusicIntent,
     ): List<ResolvedMusicEntity> {
+        when (intent) {
+            com.example.finalproject1.data.model.MusicIntent.FIND_ALBUM_FOR_SONG -> {
+                val song = entity as? ResolvedSong ?: return emptyList()
+                val albumId = song.albumId ?: return emptyList()
+                val albumName = song.albumName ?: return emptyList()
+                return listOf(ResolvedAlbum(albumId, albumName, artistName = song.artistName, artistId = song.artistId))
+            }
+            com.example.finalproject1.data.model.MusicIntent.FIND_ARTIST_FOR_SONG -> {
+                val song = entity as? ResolvedSong ?: return emptyList()
+                val artistId = song.artistId ?: return emptyList()
+                val artistName = song.artistName ?: return emptyList()
+                return listOf(ResolvedBand(artistId, artistName))
+            }
+            com.example.finalproject1.data.model.MusicIntent.FIND_BAND_FOR_MEMBER -> {
+                val member = entity as? ResolvedMember ?: return emptyList()
+                return member.bands.map { ResolvedBand(it.bandId, it.bandName) }.distinctBy { it.id }
+            }
+            else -> Unit
+        }
         val band = entity as? ResolvedBand ?: return emptyList()
         val artistId = band.musicBrainzId ?: band.id
         return when (intent) {

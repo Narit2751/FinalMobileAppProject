@@ -180,5 +180,3 @@ Requires internet: Discover refresh, unsaved details, member/album/song resoluti
 Tests use fakes and never contact live APIs. They cover mapping, query construction, rate limiting, favorites, local request parsing, missing Gemini configuration, ranking validation, unknown/duplicate IDs, result limits, and conversation reset. Room instrumentation tests require an emulator.
 
 See [docs/presentation-outline.md](docs/presentation-outline.md) and [docs/demo-script.md](docs/demo-script.md).
-#   F i n a l M o b i l e A p p P r o j e c t  
- 

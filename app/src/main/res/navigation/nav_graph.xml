@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph" app:startDestination="@id/discoverFragment">
+    <fragment android:id="@+id/discoverFragment" android:name="com.example.finalproject1.ui.discover.DiscoverFragment" android:label="@string/discover">
+        <action android:id="@+id/action_discoverFragment_to_bandDetailFragment" app:destination="@id/bandDetailFragment" />
+    </fragment>
+    <fragment android:id="@+id/aiFinderFragment" android:name="com.example.finalproject1.ui.aifinder.AiFinderFragment" android:label="@string/ai_finder">
+        <argument android:name="prefillBandName" app:argType="string" android:defaultValue="" />
+        <action android:id="@+id/action_aiFinderFragment_to_bandDetailFragment" app:destination="@id/bandDetailFragment" />
+        <action android:id="@+id/action_aiFinderFragment_to_albumDetailFragment" app:destination="@id/albumDetailFragment" />
+    </fragment>
+    <fragment android:id="@+id/favoritesFragment" android:name="com.example.finalproject1.ui.favorites.FavoritesFragment" android:label="@string/favorites">
+        <action android:id="@+id/action_favoritesFragment_to_bandDetailFragment" app:destination="@id/bandDetailFragment" />
+    </fragment>
+    <fragment android:id="@+id/bandDetailFragment" android:name="com.example.finalproject1.ui.banddetail.BandDetailFragment" android:label="@string/band_details">
+        <argument android:name="artistId" app:argType="string" />
+        <action android:id="@+id/action_bandDetailFragment_to_albumDetailFragment" app:destination="@id/albumDetailFragment" />
+        <action android:id="@+id/action_bandDetailFragment_to_aiFinderFragment" app:destination="@id/aiFinderFragment" />
+    </fragment>
+    <fragment android:id="@+id/albumDetailFragment" android:name="com.example.finalproject1.ui.albumdetail.AlbumDetailFragment" android:label="@string/album_details">
+        <argument android:name="albumId" app:argType="string" />
+        <argument android:name="title" app:argType="string" />
+        <argument android:name="albumType" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="firstReleaseDate" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="imageUrl" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+        <argument android:name="sourceUrl" app:argType="string" app:nullable="true" android:defaultValue="@null" />
+    </fragment>
+</navigation>

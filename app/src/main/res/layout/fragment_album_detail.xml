@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/surface_background"
+        android:navigationContentDescription="@string/navigate_back"
+        android:title="@string/album_details"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="@color/text_primary"
+        app:titleTextColor="@color/text_primary" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical" android:padding="24dp">
+            <ImageView android:id="@+id/cover" android:layout_width="280dp" android:layout_height="280dp" android:background="@drawable/album_placeholder" android:scaleType="centerCrop" android:contentDescription="@string/album_art_unavailable" />
+            <TextView android:id="@+id/artwork_status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/album_art_unavailable" android:textColor="@color/text_secondary" android:visibility="gone" />
+            <TextView android:id="@+id/title" style="@style/TextAppearance.OtoNavi.Display" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:gravity="center" android:textColor="@color/text_primary" android:textSize="32sp" />
+            <TextView android:id="@+id/type" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center" android:textColor="@color/text_secondary" android:textSize="16sp" />
+            <TextView android:id="@+id/date" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:gravity="center" android:textColor="@color/text_secondary" android:textSize="16sp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/musicbrainz_button" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="52dp" android:layout_marginTop="24dp" android:text="@string/open_musicbrainz" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:gravity="center" android:text="@string/musicbrainz_attribution" android:textColor="@color/text_secondary" android:textSize="13sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

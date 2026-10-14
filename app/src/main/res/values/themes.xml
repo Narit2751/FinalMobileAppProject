@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.OtoNavi" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/vermilion</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/cyan</item>
+        <item name="colorOnSecondary">@color/navy</item>
+        <item name="colorPrimaryContainer">@color/vermilion_dark</item>
+        <item name="colorOnPrimaryContainer">@color/snow</item>
+        <item name="colorSecondaryContainer">@color/navy_elevated</item>
+        <item name="colorOnSecondaryContainer">@color/snow</item>
+        <item name="colorSurface">@color/surface_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/navy_elevated</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorSurfaceContainer">@color/surface_card</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="android:colorAccent">@color/vermilion</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textViewStyle">@style/Widget.OtoNavi.TextView</item>
+        <item name="android:windowBackground">@color/navy</item>
+        <item name="android:navigationBarColor">@color/navy</item>
+        <item name="android:statusBarColor">@color/navy</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="shapeAppearanceSmallComponent">@style/Shape.OtoNavi.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/Shape.OtoNavi.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/Shape.OtoNavi.Large</item>
+    </style>
+    <style name="Shape.OtoNavi.Small" parent="ShapeAppearance.Material3.Corner.Small"><item name="cornerSize">10dp</item></style>
+    <style name="Shape.OtoNavi.Medium" parent="ShapeAppearance.Material3.Corner.Medium"><item name="cornerSize">16dp</item></style>
+    <style name="Shape.OtoNavi.Large" parent="ShapeAppearance.Material3.Corner.Large"><item name="cornerSize">24dp</item></style>
+    <style name="ShapeAppearanceOverlay.OtoNavi.RoundedImage" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+    <style name="ShapeAppearanceOverlay.OtoNavi.Circle" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    <style name="Widget.OtoNavi.TextView" parent="@android:style/Widget.TextView">
+        <item name="android:shadowColor">@color/text_outline</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">3</item>
+    </style>
+    <style name="TextAppearance.OtoNavi.Display" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="fontFamily">@font/zen_tokyo_zoo</item>
+        <item name="android:fontFamily">@font/zen_tokyo_zoo</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+</resources>

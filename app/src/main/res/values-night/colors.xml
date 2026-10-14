@@ -1,0 +1,8 @@
+<resources>
+    <!-- Keep the photographic woodblock treatment consistent in night mode. -->
+    <color name="surface_background">#C7061B24</color>
+    <color name="surface_card">#E6172B31</color>
+    <color name="text_primary">#FFF7E4</color>
+    <color name="text_secondary">#D4E2DE</color>
+    <color name="outline">#A8C4C4</color>
+</resources>

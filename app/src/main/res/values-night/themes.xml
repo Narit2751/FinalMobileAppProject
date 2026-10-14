@@ -1,0 +1,28 @@
+<resources>
+    <style name="Theme.OtoNavi" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/vermilion</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/cyan</item>
+        <item name="colorOnSecondary">@color/navy</item>
+        <item name="colorPrimaryContainer">@color/vermilion_dark</item>
+        <item name="colorOnPrimaryContainer">@color/snow</item>
+        <item name="colorSecondaryContainer">@color/navy_elevated</item>
+        <item name="colorOnSecondaryContainer">@color/snow</item>
+        <item name="colorSurface">@color/surface_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/navy_elevated</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorSurfaceContainer">@color/surface_card</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="android:colorAccent">@color/vermilion</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textViewStyle">@style/Widget.OtoNavi.TextView</item>
+        <item name="android:windowBackground">@color/surface_background</item>
+        <item name="android:navigationBarColor">@color/navy</item>
+        <item name="android:statusBarColor">@color/navy</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="shapeAppearanceSmallComponent">@style/Shape.OtoNavi.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/Shape.OtoNavi.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/Shape.OtoNavi.Large</item>
+    </style>
+</resources>

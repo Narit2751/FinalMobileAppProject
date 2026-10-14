@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Winter woodblock palette sampled from the app background. -->
+    <color name="navy">#061B24</color>
+    <color name="navy_elevated">#17313A</color>
+    <color name="vermilion">#D53A28</color>
+    <color name="vermilion_dark">#9E2C22</color>
+    <color name="cyan">#A8D7DC</color>
+    <color name="snow">#FFF7E4</color>
+    <color name="outline">#A8C4C4</color>
+    <color name="surface_background">#C7061B24</color>
+    <color name="surface_card">#E6172B31</color>
+    <color name="active_indicator">#804E7278</color>
+    <color name="background_scrim">#52000C12</color>
+    <color name="text_outline">#F0051116</color>
+    <color name="text_primary">#FFF7E4</color>
+    <color name="text_secondary">#D4E2DE</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingStart="20dp" android:paddingTop="24dp" android:paddingEnd="20dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:fontFamily="sans-serif-medium" android:letterSpacing="0.16" android:text="@string/brand_wordmark" android:textColor="@color/vermilion" android:textSize="16sp" android:textStyle="bold" />
+        <TextView style="@style/TextAppearance.OtoNavi.Display" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/explore_title" android:textColor="@color/text_primary" android:textSize="32sp" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:hint="@string/search_hint" app:boxBackgroundMode="outline" app:boxCornerRadiusBottomEnd="14dp" app:boxCornerRadiusBottomStart="14dp" app:boxCornerRadiusTopEnd="14dp" app:boxCornerRadiusTopStart="14dp">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/search_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:imeOptions="actionSearch" android:inputType="text" android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/search_button" android:layout_width="wrap_content" android:layout_height="56dp" android:layout_marginStart="8dp" android:text="@string/search" />
+        </LinearLayout>
+    </LinearLayout>
+    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none" android:paddingHorizontal="16dp">
+        <com.google.android.material.chip.ChipGroup android:id="@+id/genre_group" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingVertical="10dp" app:selectionRequired="true" app:singleSelection="true">
+            <com.google.android.material.chip.Chip android:id="@+id/genre_rock" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="@string/genre_rock" />
+            <com.google.android.material.chip.Chip android:id="@+id/genre_pop" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/genre_pop" />
+            <com.google.android.material.chip.Chip android:id="@+id/genre_metal" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/genre_metal" />
+            <com.google.android.material.chip.Chip android:id="@+id/genre_punk" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/genre_punk" />
+            <com.google.android.material.chip.Chip android:id="@+id/genre_jazz" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/genre_jazz" />
+            <com.google.android.material.chip.Chip android:id="@+id/genre_electronic" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/genre_electronic" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:id="@+id/swipe_refresh" android:layout_width="match_parent" android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/band_list" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingBottom="16dp" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <ProgressBar android:id="@+id/progress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center" />
+        <LinearLayout android:id="@+id/state_panel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="32dp" android:visibility="gone">
+            <TextView android:id="@+id/state_message" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:textColor="@color/text_secondary" android:textSize="16sp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/retry_button" style="@style/Widget.Material3.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="48dp" android:layout_marginTop="12dp" android:text="@string/retry" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

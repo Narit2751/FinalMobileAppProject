@@ -134,6 +134,17 @@ The app compiles and its non-AI features run without Gemini configuration.
 
 ## Gemini configuration
 
+### After cloning onto another computer
+
+`local.properties` is intentionally ignored by Git: it contains your private key and a computer-specific Android SDK path. Cloning does not copy it, and Android Studio only recreates the SDK setting.
+
+1. Open the cloned project in Android Studio so it creates `local.properties` with the new computer's `sdk.dir`.
+2. Use [`local.properties.example`](local.properties.example) as a reference. Append `GEMINI_API_KEY=` to root `local.properties` and enter your own key after `=` without quotes. Keep the generated `sdk.dir` unchanged.
+3. Select the **debug** build variant, sync Gradle, and rebuild/run the app. The key is loaded at build time, so an already installed APK will not pick up edits to this file.
+4. If using environment variables, restart Android Studio after setting them. A nonblank environment value takes precedence over `local.properties`; blank values are ignored.
+
+For release builds, configure your deployed `AI_PROXY_BASE_URL` instead. Direct Gemini keys are intentionally included only in debug builds. Do not commit the actual `local.properties` or copy another computer's SDK path.
+
 Create a current Gemini Developer API authorization key in [Google AI Studio](https://aistudio.google.com/app/apikey). Two runtime modes are supported.
 
 ### Production backend proxy

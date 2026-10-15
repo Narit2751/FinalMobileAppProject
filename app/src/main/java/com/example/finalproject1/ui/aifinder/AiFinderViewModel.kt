@@ -407,7 +407,7 @@ class AiFinderViewModel(
 
     companion object {
         const val GREETING = "Hi! I can help you discover Japanese music. Enter a band, member, album, song, genre, mood, or listening activity."
-        const val MISSING_CONFIGURATION = "Gemini is not configured. Add the local debug configuration or configure the AI proxy to enable chat recommendations."
+        const val MISSING_CONFIGURATION = "Gemini is not configured on this computer. For debug builds, add GEMINI_API_KEY to root local.properties (see local.properties.example), then rebuild and run the app. Release builds require AI_PROXY_BASE_URL."
         const val OUT_OF_SCOPE = "I can help you discover Japanese bands, members, albums, and songs. Try entering a name, genre, mood, or listening activity."
         val RECOMMENDATION_INTENTS = setOf(MusicIntent.RECOMMEND_BANDS, MusicIntent.RECOMMEND_SONGS, MusicIntent.RECOMMEND_ALBUMS, MusicIntent.RECOMMEND_SIMILAR, MusicIntent.REFINE_PREVIOUS)
         val RELATED_INTENTS = setOf(

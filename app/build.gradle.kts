@@ -12,14 +12,23 @@ val localProperties = Properties().apply {
         localPropertiesFile.inputStream().use(::load)
     }
 }
-val localGeminiApiKey = providers.environmentVariable("GEMINI_API_KEY").orNull
-    ?: localProperties.getProperty("GEMINI_API_KEY", "")
-val geminiModel = providers.environmentVariable("GEMINI_MODEL").orNull
-    ?: localProperties.getProperty("GEMINI_MODEL", "gemini-3.5-flash-lite")
-val aiProxyBaseUrl = providers.environmentVariable("AI_PROXY_BASE_URL").orNull
-    ?: localProperties.getProperty("AI_PROXY_BASE_URL", "")
-val audioDbApiKey = providers.environmentVariable("THEAUDIODB_API_KEY").orNull
-    ?: localProperties.getProperty("THEAUDIODB_API_KEY", "123")
+fun localSetting(name: String, default: String = ""): String =
+    providers.environmentVariable(name).orNull?.trim()?.takeIf { it.isNotEmpty() }
+        ?: localProperties.getProperty(name)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: default
+
+val localGeminiApiKey = localSetting("GEMINI_API_KEY")
+val geminiModel = localSetting("GEMINI_MODEL", "gemini-3.5-flash-lite")
+val aiProxyBaseUrl = localSetting("AI_PROXY_BASE_URL")
+val audioDbApiKey = localSetting("THEAUDIODB_API_KEY", "123")
+
+if (localGeminiApiKey.isBlank() && aiProxyBaseUrl.isBlank()) {
+    logger.warn(
+        "Gemini chat is not configured on this computer. Add GEMINI_API_KEY to root " +
+            "local.properties for debug builds (see local.properties.example), then rebuild. " +
+            "Release builds require AI_PROXY_BASE_URL."
+    )
+}
 
 fun asBuildConfigString(value: String): String =
     "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""

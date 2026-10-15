@@ -104,7 +104,7 @@ class BandDetailViewModel(
             } catch (_: AiNotConfiguredException) {
                 _state.value.copy(
                     aiLoading = false,
-                    aiExplanation = "Gemini is not configured. Add the local debug configuration or configure the AI proxy.",
+                    aiExplanation = "Gemini is not configured on this computer. Add GEMINI_API_KEY to root local.properties and rebuild debug, or configure AI_PROXY_BASE_URL for release.",
                 )
             } catch (_: Exception) {
                 _state.value.copy(

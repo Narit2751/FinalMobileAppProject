@@ -1,0 +1,12 @@
+# Setup reference only: Gradle reads local.properties, not this example.
+# On each computer, open the project in Android Studio to create local.properties
+# with that computer's sdk.dir. Append the settings below to that file.
+# Do not overwrite sdk.dir with a path from another computer.
+# Obtain your key at https://aistudio.google.com/app/apikey
+# Enter the key without quotes after the equals sign. Never commit the real key.
+GEMINI_API_KEY=
+
+# Optional overrides. Blank values use the application's defaults.
+GEMINI_MODEL=
+# For release builds, configure your deployed HTTPS backend instead of a direct key.
+AI_PROXY_BASE_URL=
